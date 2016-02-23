@@ -1,0 +1,6 @@
+[submodule "vendor/github.com/constabulary/gb"]
+	path = vendor/github.com/constabulary/gb
+	url = https://github.com/constabulary/gb
+[submodule "vendor/golang.org/x/tools"]
+	path = vendor/golang.org/x/tools
+	url = https://go.googlesource.com/tools
