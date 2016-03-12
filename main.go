@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"sort"
 	"strings"
 
 	// TODO: replace this dependency by stdlib
@@ -53,17 +52,12 @@ func run(path string) error {
 			return fmt.Errorf("unable to locate depset for %q", path)
 		}
 
-		missing := findMissing(pkgs(is.Pkgs), dsm)
-		if len(missing) == 0 {
+		pkg := findMissing(pkgs(is.Pkgs), dsm)
+		if pkg == nil {
 			break
 		}
-		// sort keys in ascending order, so the shortest missing import path
-		// with be fetched first.
-		keys := keys(missing)
-		sort.Strings(keys)
-		pkg := keys[0]
-		fmt.Fprintf(os.Stderr, "analyzing recursive dependency %s\n", pkg)
-		if _, err := repo.vendorDep(pkg); err != nil {
+		fmt.Fprintf(os.Stderr, "analyzing recursive dependency %s\n", *pkg)
+		if _, err := repo.vendorDep(*pkg); err != nil {
 			return err
 		}
 	}

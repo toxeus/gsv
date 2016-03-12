@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"go/build"
 	"net/url"
+	"sort"
 
 	"github.com/constabulary/gb/vendor"
 )
@@ -24,7 +25,7 @@ func pkgs(m map[string]*vendor.Pkg) []*vendor.Pkg {
 	return p
 }
 
-func findMissing(pkgs []*vendor.Pkg, dsm map[string]*vendor.Depset) map[string]bool {
+func findMissing(pkgs []*vendor.Pkg, dsm map[string]*vendor.Depset) *string {
 	missing := make(map[string]bool)
 	imports := make(map[string]*vendor.Pkg)
 	for _, s := range dsm {
@@ -89,7 +90,14 @@ func findMissing(pkgs []*vendor.Pkg, dsm map[string]*vendor.Depset) map[string]b
 	for _, pkg := range pkgs {
 		fn(pkg.ImportPath)
 	}
-	return missing
+	if len(missing) == 0 {
+		return nil
+	}
+	// sort keys in ascending order, so the shortest missing import path
+	// with be fetched first.
+	keys := keys(missing)
+	sort.Strings(keys)
+	return &keys[0]
 }
 
 // stripscheme removes any scheme components from url like paths.
